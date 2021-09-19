@@ -62,7 +62,7 @@ public class BankEditor extends AppLayout implements HasUrlParameter<Integer> {
         configureListeners();
     }
 
-    public void fillForm() {
+    private void fillForm() {
         if (bank.getId() != null) {
             nameField.setValue(bank.getName());
         }
@@ -76,7 +76,7 @@ public class BankEditor extends AppLayout implements HasUrlParameter<Integer> {
         binder.setBean(bank);
     }
 
-    public void configureListeners() {
+    private void configureListeners() {
 
         saveBtn.addClickListener(clickEvent -> {
             if (binder.validate().isOk()) {

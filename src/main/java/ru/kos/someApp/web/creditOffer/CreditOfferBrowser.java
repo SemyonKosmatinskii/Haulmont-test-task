@@ -55,7 +55,7 @@ public class CreditOfferBrowser extends AppLayout {
     }
 
     @PostConstruct
-    public void fillGrid() {
+    private void fillGrid() {
 
         List<CreditOffer> creditOffers = creditOfferService.getAll();
         if (!creditOffers.isEmpty()) {
@@ -73,33 +73,7 @@ public class CreditOfferBrowser extends AppLayout {
             }));
 
             grid.addColumn(new NativeButtonRenderer<>("Удалить", creditOffer -> {
-                Dialog dialog = new Dialog();
-                Button confirm = new Button("Удалить");
-                Button cancel = new Button("Отмена");
-                dialog.add("Вы уверены что хотите удалить кредитное предложение?");
-                dialog.add(confirm);
-                dialog.add(cancel);
-
-                confirm.addClickListener(clickEvent -> {
-                    Bank bank = creditOffer.getCredit().getBank();
-                    Client client = creditOffer.getClient();
-                    bank.removeClient(client);
-                    clientService.add(client);
-                    bankService.add(bank);
-                    creditOfferService.delete(creditOffer);
-                    dialog.close();
-                    Notification notification = new Notification("Кредитное предложение удалено",
-                            DURATION_OF_NOTIFICATION_SHORT);
-                    notification.setPosition(Notification.Position.MIDDLE);
-                    notification.open();
-
-                    grid.setItems(creditOfferService.getAll());
-                });
-
-                cancel.addClickListener(clickEvent -> {
-                    dialog.close();
-                });
-
+                Dialog dialog = createDeleteDialog(creditOffer);
                 dialog.open();
             }));
 
@@ -118,5 +92,39 @@ public class CreditOfferBrowser extends AppLayout {
                 UI.getCurrent().navigate(CreditOfferEditor.class, e.getItem().getId());
             });
         }
+    }
+
+    private Dialog createDeleteDialog(CreditOffer creditOffer) {
+        Dialog dialog = new Dialog();
+        Button confirm = new Button("Удалить");
+        Button cancel = new Button("Отмена");
+        dialog.add("Вы уверены что хотите удалить кредитное предложение?");
+        dialog.add(confirm);
+        dialog.add(cancel);
+
+        confirm.addClickListener(clickEvent -> {
+            deleteCreditOffer(creditOffer);
+            creditOfferService.delete(creditOffer);
+            dialog.close();
+            Notification notification = new Notification("Кредитное предложение удалено",
+                    DURATION_OF_NOTIFICATION_SHORT);
+            notification.setPosition(Notification.Position.MIDDLE);
+            notification.open();
+
+            grid.setItems(creditOfferService.getAll());
+        });
+
+        cancel.addClickListener(clickEvent -> {
+            dialog.close();
+        });
+        return dialog;
+    }
+
+    private void deleteCreditOffer(CreditOffer creditOffer) {
+        Bank bank = creditOffer.getCredit().getBank();
+        Client client = creditOffer.getClient();
+        bank.removeClient(client);
+        clientService.add(client);
+        bankService.add(bank);
     }
 }

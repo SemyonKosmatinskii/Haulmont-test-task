@@ -20,7 +20,7 @@ import java.util.List;
 public class PaymentServiceImpl implements PaymentService {
 
     @Autowired
-    PaymentRepository paymentRepository;
+    private PaymentRepository paymentRepository;
 
     @Override
     public Payment add(Payment payment) {

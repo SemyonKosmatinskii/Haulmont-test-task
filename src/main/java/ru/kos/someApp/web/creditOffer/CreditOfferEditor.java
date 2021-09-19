@@ -143,7 +143,7 @@ public class CreditOfferEditor extends AppLayout implements HasUrlParameter<Inte
         configureListeners();
     }
 
-    public void fillForm() {
+    private void fillForm() {
         paymentGrid.addColumn(column ->
                 new SimpleDateFormat("dd MMMM yyyy").format(column.getStartDate())).setHeader("Дата");
         paymentGrid.addColumn(column ->
@@ -241,7 +241,7 @@ public class CreditOfferEditor extends AppLayout implements HasUrlParameter<Inte
         binder.setBean(creditOffer);
     }
 
-    public void configureListeners() {
+    private void configureListeners() {
 
         List<Payment> cleanList = new ArrayList<>();
 

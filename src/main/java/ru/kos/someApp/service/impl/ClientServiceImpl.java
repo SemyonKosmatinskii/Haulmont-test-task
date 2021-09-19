@@ -15,7 +15,7 @@ import java.util.Optional;
 public class ClientServiceImpl implements ClientService {
 
     @Autowired
-    ClientRepository repository;
+    private ClientRepository repository;
 
     @Override
     public Client add(Client client) {

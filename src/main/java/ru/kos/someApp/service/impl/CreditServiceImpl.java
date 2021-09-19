@@ -16,7 +16,7 @@ import java.util.Optional;
 public class CreditServiceImpl implements CreditService {
 
     @Autowired
-    CreditRepository repository;
+    private CreditRepository repository;
 
     @Override
     public Credit add(Credit credit) {

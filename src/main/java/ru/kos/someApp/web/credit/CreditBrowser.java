@@ -38,7 +38,7 @@ public class CreditBrowser extends AppLayout {
     }
 
     @PostConstruct
-    public void fillGrid() {
+    private void fillGrid() {
 
         List<Credit> credits = creditService.getAll();
         if (!credits.isEmpty()) {
@@ -53,37 +53,7 @@ public class CreditBrowser extends AppLayout {
             }));
 
             grid.addColumn(new NativeButtonRenderer<>("Удалить", credit -> {
-                Dialog dialog = new Dialog();
-                Button confirm = new Button("Удалить");
-                Button cancel = new Button("Отмена");
-                dialog.add("Вы уверены что хотите удалить кредит?");
-                dialog.add(confirm);
-                dialog.add(cancel);
-
-                confirm.addClickListener(clickEvent -> {
-                    try {
-                        creditService.delete(credit);
-                    } catch (Exception e) {
-                        Notification notification = new Notification(
-                                "У кредита имеются открытые кредитные предложения", DURATION_OF_NOTIFICATION_LONG);
-                        notification.setPosition(Notification.Position.MIDDLE);
-                        notification.open();
-                        dialog.close();
-                        return;
-                    }
-                    dialog.close();
-                    Notification notification = new Notification("Кредит удален", DURATION_OF_NOTIFICATION_SHORT);
-                    notification.setPosition(Notification.Position.MIDDLE);
-                    notification.open();
-
-                    grid.setItems(creditService.getAll());
-
-                });
-
-                cancel.addClickListener(clickEvent -> {
-                    dialog.close();
-                });
-
+                Dialog dialog = createDeleteDialog(credit);
                 dialog.open();
             }));
 
@@ -93,5 +63,39 @@ public class CreditBrowser extends AppLayout {
                 UI.getCurrent().navigate(CreditEditor.class, e.getItem().getId());
             });
         }
+    }
+
+    private Dialog createDeleteDialog(Credit credit) {
+        Dialog dialog = new Dialog();
+        Button confirm = new Button("Удалить");
+        Button cancel = new Button("Отмена");
+        dialog.add("Вы уверены что хотите удалить кредит?");
+        dialog.add(confirm);
+        dialog.add(cancel);
+
+        confirm.addClickListener(clickEvent -> {
+            try {
+                creditService.delete(credit);
+            } catch (Exception e) {
+                Notification notification = new Notification(
+                        "У кредита имеются открытые кредитные предложения", DURATION_OF_NOTIFICATION_LONG);
+                notification.setPosition(Notification.Position.MIDDLE);
+                notification.open();
+                dialog.close();
+                return;
+            }
+            dialog.close();
+            Notification notification = new Notification("Кредит удален", DURATION_OF_NOTIFICATION_SHORT);
+            notification.setPosition(Notification.Position.MIDDLE);
+            notification.open();
+
+            grid.setItems(creditService.getAll());
+
+        });
+
+        cancel.addClickListener(clickEvent -> {
+            dialog.close();
+        });
+        return dialog;
     }
 }

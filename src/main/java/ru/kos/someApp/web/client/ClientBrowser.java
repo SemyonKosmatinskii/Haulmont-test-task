@@ -38,7 +38,7 @@ public class ClientBrowser extends AppLayout {
     }
 
     @PostConstruct
-    public void fillGrid() {
+    private void fillGrid() {
         List<Client> clients = clientService.getAll();
         if (!clients.isEmpty()) {
             grid.addColumn(Client::getLastName).setHeader("Фамилия");
@@ -53,39 +53,8 @@ public class ClientBrowser extends AppLayout {
             }));
 
             grid.addColumn(new NativeButtonRenderer<>("Удалить", client -> {
-                Dialog dialog = new Dialog();
-                Button confirm = new Button("Удалить");
-                Button cancel = new Button("Отмена");
-                dialog.add("Вы уверены что хотите удалить клиента?");
-                dialog.add(confirm);
-                dialog.add(cancel);
-
-                confirm.addClickListener(clickEvent -> {
-                    try {
-                       clientService.delete(client);
-                    } catch (Exception e) {
-                        Notification notification = new Notification(
-                                "У клиента имеются открытые кредитные предложения", DURATION_OF_NOTIFICATION_LONG);
-                        notification.setPosition(Notification.Position.MIDDLE);
-                        notification.open();
-                        dialog.close();
-                        return;
-                    }
-                    dialog.close();
-                    Notification notification = new Notification("Клиент удален", DURATION_OF_NOTIFICATION_SHORT);
-                    notification.setPosition(Notification.Position.MIDDLE);
-                    notification.open();
-
-                    grid.setItems(clientService.getAll());
-
-                });
-
-                cancel.addClickListener(clickEvent -> {
-                    dialog.close();
-                });
-
+                Dialog dialog = createDeleteDialog(client);
                 dialog.open();
-
             }));
 
             grid.setItems(clients);
@@ -94,5 +63,39 @@ public class ClientBrowser extends AppLayout {
                 UI.getCurrent().navigate(ClientEditor.class, e.getItem().getId());
             });
         }
+    }
+
+    private Dialog createDeleteDialog(Client client) {
+        Dialog dialog = new Dialog();
+        Button confirm = new Button("Удалить");
+        Button cancel = new Button("Отмена");
+        dialog.add("Вы уверены что хотите удалить клиента?");
+        dialog.add(confirm);
+        dialog.add(cancel);
+
+        confirm.addClickListener(clickEvent -> {
+            try {
+               clientService.delete(client);
+            } catch (Exception e) {
+                Notification notification = new Notification(
+                        "У клиента имеются открытые кредитные предложения", DURATION_OF_NOTIFICATION_LONG);
+                notification.setPosition(Notification.Position.MIDDLE);
+                notification.open();
+                dialog.close();
+                return;
+            }
+            dialog.close();
+            Notification notification = new Notification("Клиент удален", DURATION_OF_NOTIFICATION_SHORT);
+            notification.setPosition(Notification.Position.MIDDLE);
+            notification.open();
+
+            grid.setItems(clientService.getAll());
+
+        });
+
+        cancel.addClickListener(clickEvent -> {
+            dialog.close();
+        });
+        return dialog;
     }
 }

@@ -48,7 +48,7 @@ public class BankBrowser extends AppLayout {
     }
 
     @PostConstruct
-    public void fillGrid() {
+    private void fillGrid() {
         List<Bank> banks = bankService.getAll();
         if (!banks.isEmpty()) {
             bankGrid.addColumn(Bank::getName).setHeader("Название");
@@ -58,93 +58,17 @@ public class BankBrowser extends AppLayout {
             }));
 
             bankGrid.addColumn(new NativeButtonRenderer<>("Удалить", bank -> {
-                Dialog dialog = new Dialog();
-                Button confirm = new Button("Удалить");
-                Button cancel = new Button("Отмена");
-                dialog.add("Вы уверены что хотите удалить банк?");
-                dialog.add(confirm);
-                dialog.add(cancel);
-
-                Dialog innerDialog = new Dialog();
-                Button innerConfirm = new Button("Удалить");
-                Button innerCancel = new Button("Отмена");
-                innerDialog.add("Вместе с банком будут удалены все его кредиты");
-                innerDialog.add(innerConfirm);
-                innerDialog.add(innerCancel);
-
-
-                confirm.addClickListener(buttonClickEvent -> {
-                    dialog.close();
-                    innerDialog.open();
-                });
-                innerConfirm.addClickListener(clickEvent -> {
-                    try {
-                        bankService.delete(bank);
-                    } catch (Exception e) {
-                        Notification notification = new Notification(
-                                "Кредиты этого банка фигурируют в существующих кредитных предложениях",
-                                DURATION_OF_NOTIFICATION_LONG);
-                        notification.setPosition(Notification.Position.MIDDLE);
-                        notification.open();
-                        innerDialog.close();
-                        return;
-                    }
-                    innerDialog.close();
-                    Notification notification = new Notification("Банк удален", DURATION_OF_NOTIFICATION_SHORT);
-                    notification.setPosition(Notification.Position.MIDDLE);
-                    notification.open();
-
-                    bankGrid.setItems(bankService.getAll());
-
-                });
-
-                innerCancel.addClickListener(clickEvent -> {
-                    dialog.close();
-                    innerDialog.close();
-                });
-
-                cancel.addClickListener(clickEvent -> {
-                    dialog.close();
-                });
-
+                Dialog dialog = createDeleteDialog(bank);
                 dialog.open();
-
             }));
 
             bankGrid.addColumn(new NativeButtonRenderer<>("Клиенты банка", bank -> {
-                Dialog dialog = new Dialog();
-                Grid<Client> grid = new Grid<>();
-                List<Client> clientList = clientService.getAllByBankId(bank.getId());
-
-                dialog.setWidth("1100px");
-                dialog.setHeight("600px");
-                grid.addColumn(Client::getLastName).setHeader("Фамилия");
-                grid.addColumn(Client::getFirstName).setHeader("Имя");
-                grid.addColumn(Client::getPatronymic).setHeader("Отчество");
-                grid.addColumn(Client::getPhoneNumber).setHeader("Номер телефона");
-                grid.addColumn(Client::getEmail).setHeader("email");
-                grid.addColumn(Client::getPassportData).setHeader("№ паспорта");
-                grid.setSizeFull();
-                grid.setItems(clientList);
-                dialog.add(grid);
+                Dialog dialog = createClientsDialog(bank);
                 dialog.open();
             }));
 
             bankGrid.addColumn(new NativeButtonRenderer<>("Кредиты банка", bank -> {
-
-                Dialog dialog = new Dialog();
-                Grid<Credit> grid = new Grid<>();
-                List<Credit> creditList = creditService.getAllByBank(bank);
-
-                dialog.setWidth("800px");
-                dialog.setHeight("600px");
-                Grid.Column<Credit> columnTitle = grid.addColumn(Credit::getTitle).setHeader("Название");
-                grid.addColumn(Credit::getInterestRate).setHeader("Процентная ставка");
-                grid.addColumn(Credit::getLimitSum).setHeader("Максимальная сумма");
-                grid.addColumn(Credit::getTerm).setHeader("Срок (в мес.)");
-                grid.setSizeFull();
-                grid.setItems(creditList);
-                dialog.add(grid);
+                Dialog dialog = createCreditsDialog(bank);
                 dialog.open();
             }));
 
@@ -154,5 +78,97 @@ public class BankBrowser extends AppLayout {
                 UI.getCurrent().navigate(BankEditor.class, e.getItem().getId());
             });
         }
+    }
+
+    private Dialog createDeleteDialog(Bank bank) {
+        Dialog dialog = new Dialog();
+        Button confirm = new Button("Удалить");
+        Button cancel = new Button("Отмена");
+        dialog.add("Вы уверены что хотите удалить банк?");
+        dialog.add(confirm);
+        dialog.add(cancel);
+
+        Dialog innerDialog = new Dialog();
+        Button innerConfirm = new Button("Удалить");
+        Button innerCancel = new Button("Отмена");
+        innerDialog.add("Вместе с банком будут удалены все его кредиты");
+        innerDialog.add(innerConfirm);
+        innerDialog.add(innerCancel);
+
+
+        confirm.addClickListener(buttonClickEvent -> {
+            dialog.close();
+            innerDialog.open();
+        });
+
+        innerConfirm.addClickListener(clickEvent -> {
+            createDeleteInnerDialog(bank, innerDialog);
+        });
+
+        innerCancel.addClickListener(clickEvent -> {
+            dialog.close();
+            innerDialog.close();
+        });
+
+        cancel.addClickListener(clickEvent -> {
+            dialog.close();
+        });
+        return dialog;
+    }
+
+    private Dialog createCreditsDialog(Bank bank) {
+        Dialog dialog = new Dialog();
+        Grid<Credit> grid = new Grid<>();
+        List<Credit> creditList = creditService.getAllByBank(bank);
+
+        dialog.setWidth("800px");
+        dialog.setHeight("600px");
+        grid.addColumn(Credit::getTitle).setHeader("Название");
+        grid.addColumn(Credit::getInterestRate).setHeader("Процентная ставка");
+        grid.addColumn(Credit::getLimitSum).setHeader("Максимальная сумма");
+        grid.addColumn(Credit::getTerm).setHeader("Срок (в мес.)");
+        grid.setSizeFull();
+        grid.setItems(creditList);
+        dialog.add(grid);
+        return dialog;
+    }
+
+    private Dialog createClientsDialog(Bank bank) {
+        Dialog dialog = new Dialog();
+        Grid<Client> grid = new Grid<>();
+        List<Client> clientList = clientService.getAllByBankId(bank.getId());
+
+        dialog.setWidth("1100px");
+        dialog.setHeight("600px");
+        grid.addColumn(Client::getLastName).setHeader("Фамилия");
+        grid.addColumn(Client::getFirstName).setHeader("Имя");
+        grid.addColumn(Client::getPatronymic).setHeader("Отчество");
+        grid.addColumn(Client::getPhoneNumber).setHeader("Номер телефона");
+        grid.addColumn(Client::getEmail).setHeader("email");
+        grid.addColumn(Client::getPassportData).setHeader("№ паспорта");
+        grid.setSizeFull();
+        grid.setItems(clientList);
+        dialog.add(grid);
+        return dialog;
+    }
+
+    private void createDeleteInnerDialog(Bank bank, Dialog innerDialog) {
+        try {
+            bankService.delete(bank);
+        } catch (Exception e) {
+            Notification notification = new Notification(
+                    "Кредиты этого банка фигурируют в существующих кредитных предложениях",
+                    DURATION_OF_NOTIFICATION_LONG);
+            notification.setPosition(Notification.Position.MIDDLE);
+            notification.open();
+            innerDialog.close();
+            return;
+        }
+        innerDialog.close();
+        Notification notification = new Notification("Банк удален", DURATION_OF_NOTIFICATION_SHORT);
+        notification.setPosition(Notification.Position.MIDDLE);
+        notification.open();
+
+        bankGrid.setItems(bankService.getAll());
     }
 }

@@ -10,6 +10,7 @@ import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.component.textfield.EmailField;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.data.binder.Binder;
+import com.vaadin.flow.data.validator.RegexpValidator;
 import com.vaadin.flow.router.BeforeEvent;
 import com.vaadin.flow.router.HasUrlParameter;
 import com.vaadin.flow.router.Route;
@@ -48,7 +49,7 @@ public class ClientEditor extends AppLayout implements HasUrlParameter<Integer> 
         numberPhoneField = new TextField("Номер телефона");
         emailField = new EmailField("Электронная почта");
         passportDataField = new TextField("Номер паспорта");
-        passportDataField.setHelperText("Должен состоять из 10 символов");
+        passportDataField.setHelperText("Должен быть не менее 6 символов и не более 12");
 
         saveBtn = new Button("Сохранить");
         cancelBtn = new Button("Отменить");
@@ -72,7 +73,7 @@ public class ClientEditor extends AppLayout implements HasUrlParameter<Integer> 
         configureListeners();
     }
 
-    public void fillForm() {
+    private void fillForm() {
         if (client.getId() != null) {
             firstNameField.setValue(client.getFirstName());
             lastNameField.setValue(client.getLastName());
@@ -90,15 +91,19 @@ public class ClientEditor extends AppLayout implements HasUrlParameter<Integer> 
         binder.forField(lastNameField)
                 .asRequired("Это обязательное поле")
                 .bind(Client::getLastName, Client::setLastName);
-//        binder.forField(numberPhoneField)
-//                .withValidator()
+        binder.forField(numberPhoneField)
+        .withValidator(new RegexpValidator("Некорректный номер телефона",
+                "^((8|\\+7)[\\- ]?)?(\\(?\\d{3}\\)?[\\- ]?)?[\\d\\- ]{7,10}$"))
+                .bind(Client::getPhoneNumber, Client::setPhoneNumber);
         binder.forField(passportDataField)
                 .asRequired("Это обязательное поле")
+                .withValidator(correctlyNumber -> correctlyNumber.length() >= 6 && correctlyNumber.length() <=12,
+                        "Минимум 6, максимум 12 символов")
                 .bind(Client::getPassportData, Client::setPassportData);
         binder.setBean(client);
     }
 
-    public void configureListeners() {
+    private void configureListeners() {
         saveBtn.addClickListener(clickEvent -> {
             if (binder.validate().isOk()) {
                 boolean isNew = client.getId() == null;

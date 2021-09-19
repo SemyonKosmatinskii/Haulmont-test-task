@@ -86,7 +86,7 @@ public class CreditEditor extends AppLayout implements HasUrlParameter<Integer> 
         configureListeners();
     }
 
-    public void fillForm() {
+    private void fillForm() {
 
         bankComboBox.setItems(bankService.getAll());
         bankComboBox.setItemLabelGenerator(Bank::getName);
@@ -102,7 +102,7 @@ public class CreditEditor extends AppLayout implements HasUrlParameter<Integer> 
         }
     }
 
-    public void configureBinding() {
+    private void configureBinding() {
         binder.forField(titleField)
                 .asRequired("Это обязательное поле")
                 .bind(Credit::getTitle, Credit::setTitle);
@@ -125,7 +125,7 @@ public class CreditEditor extends AppLayout implements HasUrlParameter<Integer> 
         binder.setBean(credit);
     }
 
-    public void configureListeners() {
+    private void configureListeners() {
         saveBtn.addClickListener(clickEvent -> {
             if (binder.validate().isOk()) {
 

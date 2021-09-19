@@ -17,7 +17,6 @@ public class PaymentDialog extends Dialog {
 
         List<Payment> paymentList = creditOffer.getPaymentList();
 
-
         double resultPayment = creditOffer.getResultPayment();
         double resultPercent = creditOffer.getResultPercent();
 

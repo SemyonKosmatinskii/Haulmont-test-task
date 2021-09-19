@@ -15,7 +15,7 @@ import java.util.Optional;
 public class BankServiceImpl implements BankService {
 
     @Autowired
-    BankRepository repository;
+    private BankRepository repository;
 
     @Override
     public Bank add(Bank bank) {

@@ -12,10 +12,7 @@ public interface PaymentService {
     Payment add(Payment payment);
     List<Payment> addListByCreditOffer(List<Payment> paymentList, CreditOffer creditOffer);
     List<Payment> getByCreditOfferId(Integer id);
-
     List<Payment> calculatePayments(Date startDate, double sum, Credit credit);
-
     double calculateResultPayment(List<Payment> paymentList, double initialFee);
-
     double calculateResultPercent(List<Payment> paymentList);
 }
