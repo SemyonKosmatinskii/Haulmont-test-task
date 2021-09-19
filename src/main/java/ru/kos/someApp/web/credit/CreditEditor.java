@@ -31,6 +31,7 @@ import java.util.Optional;
 @Route("credit")
 public class CreditEditor extends AppLayout implements HasUrlParameter<Integer> {
 
+    private static final int DURATION_OF_NOTIFICATION_SHORT = 1000;
     private final FormLayout creditForm;
     private final TextField titleField;
     private final NumberField interestRateField;
@@ -43,10 +44,10 @@ public class CreditEditor extends AppLayout implements HasUrlParameter<Integer> 
     private Credit credit;
 
     @Autowired
-    CreditService creditService;
+    private CreditService creditService;
 
     @Autowired
-    BankService bankService;
+    private BankService bankService;
 
     public CreditEditor() {
 
@@ -137,7 +138,7 @@ public class CreditEditor extends AppLayout implements HasUrlParameter<Integer> 
                 creditService.add(credit);
 
                 Notification notification = new Notification(
-                        isNew ? "Кредит успешно создан" : "Кредит был изменен", 1000
+                        isNew ? "Кредит успешно создан" : "Кредит был изменен", DURATION_OF_NOTIFICATION_SHORT
                 );
                 notification.setPosition(Notification.Position.MIDDLE);
                 notification.addDetachListener(detachEvent -> {

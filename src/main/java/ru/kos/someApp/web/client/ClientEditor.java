@@ -20,6 +20,7 @@ import ru.kos.someApp.service.ClientService;
 @Route("client")
 public class ClientEditor extends AppLayout implements HasUrlParameter<Integer> {
 
+    private static final int DURATION_OF_NOTIFICATION_SHORT = 1000;
     private final FormLayout clientForm;
     private final TextField firstNameField;
     private final TextField lastNameField;
@@ -33,7 +34,7 @@ public class ClientEditor extends AppLayout implements HasUrlParameter<Integer> 
     private Client client;
 
     @Autowired
-    ClientService clientService;
+    private ClientService clientService;
 
     public ClientEditor() {
 
@@ -89,9 +90,10 @@ public class ClientEditor extends AppLayout implements HasUrlParameter<Integer> 
         binder.forField(lastNameField)
                 .asRequired("Это обязательное поле")
                 .bind(Client::getLastName, Client::setLastName);
+//        binder.forField(numberPhoneField)
+//                .withValidator()
         binder.forField(passportDataField)
                 .asRequired("Это обязательное поле")
-                .withValidator(e -> e.length() == 10, "Номер паспорта должен состоять из 10 символов")
                 .bind(Client::getPassportData, Client::setPassportData);
         binder.setBean(client);
     }
@@ -109,7 +111,7 @@ public class ClientEditor extends AppLayout implements HasUrlParameter<Integer> 
                 clientService.add(client);
 
                 Notification notification = new Notification(
-                        isNew ? "Клиент успешно создан" : "Клиент был изменен", 1000
+                        isNew ? "Клиент успешно создан" : "Клиент был изменен", DURATION_OF_NOTIFICATION_SHORT
                 );
                 notification.setPosition(Notification.Position.MIDDLE);
                 notification.addDetachListener(detachEvent -> {

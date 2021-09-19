@@ -117,6 +117,7 @@ public class CreditOffer implements Serializable {
         this.paymentList = paymentList;
     }
 
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -130,5 +131,4 @@ public class CreditOffer implements Serializable {
     public int hashCode() {
         return 408080079;
     }
-
 }

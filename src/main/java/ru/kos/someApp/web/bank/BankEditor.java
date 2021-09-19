@@ -20,6 +20,7 @@ import ru.kos.someApp.service.BankService;
 @Route("bank")
 public class BankEditor extends AppLayout implements HasUrlParameter<Integer> {
 
+    private static final int DURATION_OF_NOTIFICATION_SHORT = 1000;
     private final TextField nameField;
     private final FormLayout bankForm;
     private final Button saveBtn;
@@ -28,8 +29,9 @@ public class BankEditor extends AppLayout implements HasUrlParameter<Integer> {
     private Bank bank;
 
 
+
     @Autowired
-    BankService bankService;
+    private BankService bankService;
 
     public BankEditor() {
 
@@ -84,7 +86,7 @@ public class BankEditor extends AppLayout implements HasUrlParameter<Integer> {
                     bankService.add(bank);
 
                     Notification notification = new Notification(
-                            isNew ? "Банк успешно создан" : "Банк был изменен", 1000
+                            isNew ? "Банк успешно создан" : "Банк был изменен", DURATION_OF_NOTIFICATION_SHORT
                     );
                     notification.setPosition(Notification.Position.MIDDLE);
                     notification.addDetachListener(detachEvent -> {

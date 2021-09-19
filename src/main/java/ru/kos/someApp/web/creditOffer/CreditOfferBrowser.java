@@ -29,20 +29,21 @@ import java.util.List;
 @Route(value = "creditOffers", layout = MainScreen.class)
 public class CreditOfferBrowser extends AppLayout {
 
+    private static final int DURATION_OF_NOTIFICATION_SHORT = 1000;
     private final Grid<CreditOffer> grid;
     private CreditOffer creditOffer;
 
     @Autowired
-    ClientService clientService;
+    private ClientService clientService;
 
     @Autowired
-    BankService bankService;
+    private BankService bankService;
 
     @Autowired
-    CreditOfferService creditOfferService;
+    private CreditOfferService creditOfferService;
 
     @Autowired
-    PaymentService paymentService;
+    private PaymentService paymentService;
 
     public CreditOfferBrowser() {
         VerticalLayout layout = new VerticalLayout();
@@ -87,7 +88,8 @@ public class CreditOfferBrowser extends AppLayout {
                     bankService.add(bank);
                     creditOfferService.delete(creditOffer);
                     dialog.close();
-                    Notification notification = new Notification("Кредитное предложение удалено", 1000);
+                    Notification notification = new Notification("Кредитное предложение удалено",
+                            DURATION_OF_NOTIFICATION_SHORT);
                     notification.setPosition(Notification.Position.MIDDLE);
                     notification.open();
 

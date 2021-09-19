@@ -46,13 +46,14 @@ public class PaymentServiceImpl implements PaymentService {
 
         List<Payment> result = new ArrayList<>();
 
-        double percent = credit.getInterestRate();
+        double annualInterestRate = credit.getInterestRate();
+        double monthlyInterestRate = annualInterestRate / (12 * 100);
         int period = credit.getTerm();
 
-        double paymentValue = (((percent / 1200 * (Math.pow((1 + percent / 1200), period)))
-                / (Math.pow((1 + percent / 1200), period) - 1)) * sum);
-        double residue = (sum - (paymentValue - (sum * percent / 1200)));
-        double percents = (sum * percent / 1200);
+        double paymentValue = (((monthlyInterestRate * (Math.pow((1 + monthlyInterestRate), period)))
+                / (Math.pow((1 + monthlyInterestRate), period) - 1)) * sum);
+        double residue = (sum - (paymentValue - (sum * monthlyInterestRate)));
+        double percents = (sum * monthlyInterestRate);
         double capital = paymentValue - percents;
 
         for (int i = 1; i <= period; i++) {
@@ -69,7 +70,7 @@ public class PaymentServiceImpl implements PaymentService {
             localStartDate = localStartDate.plusMonths(1);
             startDate = Date.from(localStartDate.atStartOfDay(ZoneId.systemDefault()).toInstant());
 
-            percents = (residue * (percent / 1200));
+            percents = (residue * (monthlyInterestRate));
             capital = paymentValue - percents;
             residue = residue - capital;
         }

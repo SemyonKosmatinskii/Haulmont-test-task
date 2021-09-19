@@ -25,16 +25,18 @@ import java.util.List;
 @Route(value = "banks", layout = MainScreen.class)
 public class BankBrowser extends AppLayout {
 
+    private static final int DURATION_OF_NOTIFICATION_LONG = 3000;
+    private static final int DURATION_OF_NOTIFICATION_SHORT = 1000;
     private final Grid<Bank> bankGrid;
 
     @Autowired
-    BankService bankService;
+    private BankService bankService;
 
     @Autowired
-    CreditService creditService;
+    private CreditService creditService;
 
     @Autowired
-    ClientService clientService;
+    private ClientService clientService;
 
     public BankBrowser() {
         VerticalLayout layout = new VerticalLayout();
@@ -80,14 +82,15 @@ public class BankBrowser extends AppLayout {
                         bankService.delete(bank);
                     } catch (Exception e) {
                         Notification notification = new Notification(
-                                "Кредиты этого банка фигурируют в существующих кредитных предложениях", 3000);
+                                "Кредиты этого банка фигурируют в существующих кредитных предложениях",
+                                DURATION_OF_NOTIFICATION_LONG);
                         notification.setPosition(Notification.Position.MIDDLE);
                         notification.open();
                         innerDialog.close();
                         return;
                     }
                     innerDialog.close();
-                    Notification notification = new Notification("Банк удален", 1000);
+                    Notification notification = new Notification("Банк удален", DURATION_OF_NOTIFICATION_SHORT);
                     notification.setPosition(Notification.Position.MIDDLE);
                     notification.open();
 

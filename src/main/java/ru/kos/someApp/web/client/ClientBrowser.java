@@ -21,10 +21,12 @@ import java.util.List;
 @Route(value = "clients", layout = MainScreen.class)
 public class ClientBrowser extends AppLayout {
 
+    private static final int DURATION_OF_NOTIFICATION_LONG = 3000;
+    private static final int DURATION_OF_NOTIFICATION_SHORT = 1000;
     private final Grid<Client> grid;
 
     @Autowired
-    ClientService clientService;
+    private ClientService clientService;
 
     public ClientBrowser() {
         VerticalLayout layout = new VerticalLayout();
@@ -63,14 +65,14 @@ public class ClientBrowser extends AppLayout {
                        clientService.delete(client);
                     } catch (Exception e) {
                         Notification notification = new Notification(
-                                "У клиента имеются открытые кредитные предложения", 3000);
+                                "У клиента имеются открытые кредитные предложения", DURATION_OF_NOTIFICATION_LONG);
                         notification.setPosition(Notification.Position.MIDDLE);
                         notification.open();
                         dialog.close();
                         return;
                     }
                     dialog.close();
-                    Notification notification = new Notification("Клиент удален", 1000);
+                    Notification notification = new Notification("Клиент удален", DURATION_OF_NOTIFICATION_SHORT);
                     notification.setPosition(Notification.Position.MIDDLE);
                     notification.open();
 

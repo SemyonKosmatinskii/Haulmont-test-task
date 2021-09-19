@@ -31,6 +31,8 @@ import java.util.List;
 @Route("credit_offer")
 public class CreditOfferEditor extends AppLayout implements HasUrlParameter<Integer> {
 
+    private static final int DURATION_OF_NOTIFICATION_LONG = 3000;
+    private static final int DURATION_OF_NOTIFICATION_SHORT = 1000;
     private final FormLayout creditOfferForm;
     private final ComboBox<Client> clientComboBox;
     private final ComboBox<Credit> creditComboBox;
@@ -54,19 +56,19 @@ public class CreditOfferEditor extends AppLayout implements HasUrlParameter<Inte
     private boolean isPaymentsCalculated;
 
     @Autowired
-    ClientService clientService;
+    private ClientService clientService;
 
     @Autowired
-    CreditService creditService;
+    private CreditService creditService;
 
     @Autowired
-    BankService bankService;
+    private BankService bankService;
 
     @Autowired
-    CreditOfferService creditOfferService;
+    private CreditOfferService creditOfferService;
 
     @Autowired
-    PaymentService paymentService;
+    private PaymentService paymentService;
 
     public CreditOfferEditor() {
         isPaymentsCalculated = true;
@@ -308,7 +310,7 @@ public class CreditOfferEditor extends AppLayout implements HasUrlParameter<Inte
                     Notification notification = new Notification(
                             isNew ? "Кредитное предложение успешно создано" :
                                     "Кредитное предложение было изменено",
-                            1000
+                            DURATION_OF_NOTIFICATION_SHORT
                     );
                     notification.setPosition(Notification.Position.MIDDLE);
                     notification.addDetachListener(detachEvent -> {
@@ -317,7 +319,8 @@ public class CreditOfferEditor extends AppLayout implements HasUrlParameter<Inte
                     creditOfferForm.setEnabled(false);
                     notification.open();
                 } else {
-                    Notification notification = new Notification("Необходимо расчитать график платежей", 3000);
+                    Notification notification = new Notification("Необходимо расчитать график платежей",
+                            DURATION_OF_NOTIFICATION_LONG);
                     notification.setPosition(Notification.Position.MIDDLE);
                     notification.open();
                 }
