@@ -20,7 +20,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import ru.kos.someApp.entity.Client;
 import ru.kos.someApp.service.ClientService;
 
-import static ru.kos.someApp.web.configs.AppConfig.DURATION_OF_NOTIFICATION_SHORT;
+import static ru.kos.someApp.web.configs.AppConfig.*;
 
 @Route("client")
 public class ClientEditor extends AppLayout implements HasUrlParameter<Integer> {
@@ -47,16 +47,16 @@ public class ClientEditor extends AppLayout implements HasUrlParameter<Integer> 
 
         clientForm = new FormLayout();
 
-        firstNameField = new TextField("Имя");
-        lastNameField = new TextField("Фамилия");
-        patronymicField = new TextField("Отчество");
-        numberPhoneField = new TextField("Номер телефона");
-        emailField = new EmailField("Электронная почта");
-        passportDataField = new TextField("Номер паспорта");
-        passportDataField.setHelperText("Не менее 6 и не более 12 символов");
+        firstNameField = new TextField(resourceBundle.getString("firstName"));
+        lastNameField = new TextField(resourceBundle.getString("lastName"));
+        patronymicField = new TextField(resourceBundle.getString("pat"));
+        numberPhoneField = new TextField(resourceBundle.getString("phone"));
+        emailField = new EmailField(resourceBundle.getString("email"));
+        passportDataField = new TextField(resourceBundle.getString("passport"));
+        passportDataField.setHelperText(resourceBundle.getString("emailHelp"));
 
-        saveBtn = new Button("Сохранить");
-        cancelBtn = new Button("Отменить");
+        saveBtn = new Button(resourceBundle.getString("save"));
+        cancelBtn = new Button(resourceBundle.getString("cancel"));
 
         clientForm.add(firstNameField, lastNameField, patronymicField, numberPhoneField,
                 emailField, passportDataField, new Div(saveBtn, cancelBtn));
@@ -67,10 +67,10 @@ public class ClientEditor extends AppLayout implements HasUrlParameter<Integer> 
     public void setParameter(BeforeEvent beforeEvent, Integer clientId) {
         client = clientService.getById(clientId).orElse(null);
         if (client != null) {
-            addToNavbar(new H3("Редактирование клиента"));
+            addToNavbar(new H3(resourceBundle.getString("edit")));
         } else {
             client = new Client();
-            addToNavbar(new H3("Создание клиента"));
+            addToNavbar(new H3(resourceBundle.getString("createClient")));
         }
         fillForm();
         configureBinding();
@@ -90,14 +90,14 @@ public class ClientEditor extends AppLayout implements HasUrlParameter<Integer> 
 
     private void configureBinding() {
         binder.forField(firstNameField)
-                .asRequired("Это обязательное поле")
+                .asRequired(resourceBundle.getString("requiredField"))
                 .bind(Client::getFirstName, Client::setFirstName);
         binder.forField(lastNameField)
-                .asRequired("Это обязательное поле")
+                .asRequired(resourceBundle.getString("requiredField"))
                 .bind(Client::getLastName, Client::setLastName);
         binder.forField(numberPhoneField)
-                .asRequired("Это обязательное поле")
-                .withValidator(new RegexpValidator("Некорректный номер телефона",
+                .asRequired(resourceBundle.getString("requiredField"))
+                .withValidator(new RegexpValidator(resourceBundle.getString("warningPhone"),
                         "^((8|\\+7)[\\- ]?)?(\\(?\\d{3}\\)?[\\- ]?)?[\\d\\- ]{7,10}$"))
                 .bind(Client::getPhoneNumber, Client::setPhoneNumber);
         binder.forField(emailField)
@@ -109,9 +109,9 @@ public class ClientEditor extends AppLayout implements HasUrlParameter<Integer> 
                 })
                 .bind(Client::getEmail, Client::setEmail);
         binder.forField(passportDataField)
-                .asRequired("Это обязательное поле")
+                .asRequired(resourceBundle.getString("requiredField"))
                 .withValidator(correctlyNumber -> correctlyNumber.length() >= 6 && correctlyNumber.length() <= 12,
-                        "Минимум 6, максимум 12 символов")
+                        resourceBundle.getString("emailHelp"))
                 .bind(Client::getPassportData, Client::setPassportData);
         binder.setBean(client);
     }
@@ -129,7 +129,9 @@ public class ClientEditor extends AppLayout implements HasUrlParameter<Integer> 
                 clientService.add(client);
 
                 Notification notification = new Notification(
-                        isNew ? "Клиент успешно создан" : "Клиент был изменен", DURATION_OF_NOTIFICATION_SHORT
+                        isNew ? resourceBundle.getString("createClientOk") :
+                                resourceBundle.getString("createCreditOk"),
+                        DURATION_OF_NOTIFICATION_SHORT
                 );
                 notification.setPosition(Notification.Position.MIDDLE);
                 notification.addDetachListener(detachEvent -> {

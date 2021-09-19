@@ -18,8 +18,7 @@ import ru.kos.someApp.web.MainScreen;
 import javax.annotation.PostConstruct;
 import java.util.List;
 
-import static ru.kos.someApp.web.configs.AppConfig.DURATION_OF_NOTIFICATION_LONG;
-import static ru.kos.someApp.web.configs.AppConfig.DURATION_OF_NOTIFICATION_SHORT;
+import static ru.kos.someApp.web.configs.AppConfig.*;
 
 @Route(value = "credits", layout = MainScreen.class)
 public class CreditBrowser extends AppLayout {
@@ -32,7 +31,8 @@ public class CreditBrowser extends AppLayout {
     public CreditBrowser() {
         VerticalLayout layout = new VerticalLayout();
         grid = new Grid<>();
-        RouterLink linkCreate = new RouterLink("Создать кредит", CreditEditor.class, 0);
+        RouterLink linkCreate = new RouterLink(resourceBundle.getString("createCredit"),
+                CreditEditor.class, 0);
         layout.add(linkCreate);
         layout.add(grid);
         setContent(layout);
@@ -43,17 +43,17 @@ public class CreditBrowser extends AppLayout {
 
         List<Credit> credits = creditService.getAll();
         if (!credits.isEmpty()) {
-            grid.addColumn(Credit::getTitle).setHeader("Название");
-            grid.addColumn(Credit::getInterestRate).setHeader("Процентная ставка");
-            grid.addColumn(Credit::getLimitSum).setHeader("Максимальная сумма");
-            grid.addColumn(Credit::getTerm).setHeader("Срок (в мес.)");
-            grid.addColumn(credit -> credit.getBank().getName()).setHeader("Банк");
+            grid.addColumn(Credit::getTitle).setHeader(resourceBundle.getString("title"));
+            grid.addColumn(Credit::getInterestRate).setHeader(resourceBundle.getString("rate"));
+            grid.addColumn(Credit::getLimitSum).setHeader(resourceBundle.getString("maxSum"));
+            grid.addColumn(Credit::getTerm).setHeader(resourceBundle.getString("term"));
+            grid.addColumn(credit -> credit.getBank().getName()).setHeader(resourceBundle.getString("bank"));
 
-            grid.addColumn(new NativeButtonRenderer<>("Редактировать", credit -> {
+            grid.addColumn(new NativeButtonRenderer<>(resourceBundle.getString("edit"), credit -> {
                 UI.getCurrent().navigate(CreditEditor.class, credit.getId());
             }));
 
-            grid.addColumn(new NativeButtonRenderer<>("Удалить", credit -> {
+            grid.addColumn(new NativeButtonRenderer<>(resourceBundle.getString("delete"), credit -> {
                 Dialog dialog = createDeleteDialog(credit);
                 dialog.open();
             }));
@@ -68,9 +68,9 @@ public class CreditBrowser extends AppLayout {
 
     private Dialog createDeleteDialog(Credit credit) {
         Dialog dialog = new Dialog();
-        Button confirm = new Button("Удалить");
-        Button cancel = new Button("Отмена");
-        dialog.add("Вы уверены что хотите удалить кредит?");
+        Button confirm = new Button(resourceBundle.getString("delete"));
+        Button cancel = new Button(resourceBundle.getString("cancel"));
+        dialog.add(resourceBundle.getString("reallyDeleteCredit"));
         dialog.add(confirm);
         dialog.add(cancel);
 
@@ -79,14 +79,15 @@ public class CreditBrowser extends AppLayout {
                 creditService.delete(credit);
             } catch (Exception e) {
                 Notification notification = new Notification(
-                        "У кредита имеются открытые кредитные предложения", DURATION_OF_NOTIFICATION_LONG);
+                        resourceBundle.getString("haveCreditOffer"), DURATION_OF_NOTIFICATION_LONG);
                 notification.setPosition(Notification.Position.MIDDLE);
                 notification.open();
                 dialog.close();
                 return;
             }
             dialog.close();
-            Notification notification = new Notification("Кредит удален", DURATION_OF_NOTIFICATION_SHORT);
+            Notification notification = new Notification(resourceBundle.getString("deleteCredit"),
+                    DURATION_OF_NOTIFICATION_SHORT);
             notification.setPosition(Notification.Position.MIDDLE);
             notification.open();
 

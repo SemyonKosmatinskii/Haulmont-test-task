@@ -17,7 +17,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import ru.kos.someApp.entity.Bank;
 import ru.kos.someApp.service.BankService;
 
-import static ru.kos.someApp.web.configs.AppConfig.DURATION_OF_NOTIFICATION_SHORT;
+import static ru.kos.someApp.web.configs.AppConfig.*;
 
 @Route("bank")
 public class BankEditor extends AppLayout implements HasUrlParameter<Integer> {
@@ -39,10 +39,10 @@ public class BankEditor extends AppLayout implements HasUrlParameter<Integer> {
         binder = new Binder<>(Bank.class);
 
         bankForm = new FormLayout();
-        nameField = new TextField("Название банка");
+        nameField = new TextField(resourceBundle.getString("title"));
 
-        saveBtn = new Button("Сохранить");
-        cancelBtn = new Button("Отменить");
+        saveBtn = new Button(resourceBundle.getString("save"));
+        cancelBtn = new Button(resourceBundle.getString("cancel"));
 
         bankForm.add(nameField, new Div(saveBtn, cancelBtn));
 
@@ -53,10 +53,10 @@ public class BankEditor extends AppLayout implements HasUrlParameter<Integer> {
     public void setParameter(BeforeEvent beforeEvent, Integer bankId) {
         bank = bankService.getById(bankId).orElse(null);
         if (bank != null) {
-            addToNavbar(new H3("Редактирование банка"));
+            addToNavbar(new H3(resourceBundle.getString("edit")));
         } else {
             bank = new Bank();
-            addToNavbar(new H3("Создание банка"));
+            addToNavbar(new H3(resourceBundle.getString("createBank")));
         }
         fillForm();
         configureBinding();
@@ -72,7 +72,7 @@ public class BankEditor extends AppLayout implements HasUrlParameter<Integer> {
     private void configureBinding() {
 
         binder.forField(nameField)
-                .asRequired("Это обязательное поле")
+                .asRequired(resourceBundle.getString("requiredField"))
                 .bind(Bank::getName, Bank::setName);
         binder.setBean(bank);
     }
@@ -87,7 +87,9 @@ public class BankEditor extends AppLayout implements HasUrlParameter<Integer> {
                     bankService.add(bank);
 
                     Notification notification = new Notification(
-                            isNew ? "Банк успешно создан" : "Банк был изменен", DURATION_OF_NOTIFICATION_SHORT
+                            isNew ? resourceBundle.getString("createBankOk") :
+                                    resourceBundle.getString("editBankOk"),
+                            DURATION_OF_NOTIFICATION_SHORT
                     );
                     notification.setPosition(Notification.Position.MIDDLE);
                     notification.addDetachListener(detachEvent -> {
@@ -97,10 +99,8 @@ public class BankEditor extends AppLayout implements HasUrlParameter<Integer> {
                     notification.open();
                 } catch (Exception e) {
                     Dialog dialog = new Dialog();
-                    Button okBtn = new Button("ОК");
-                    dialog.add(
-                            "Проверьте правильность введенных данных, возможно, банк с таким названием уже существует"
-                    );
+                    Button okBtn = new Button(resourceBundle.getString("ok"));
+                    dialog.add(resourceBundle.getString("warningBank"));
                     dialog.add(okBtn);
                     okBtn.addClickListener(buttonClickEvent -> dialog.close());
                     dialog.open();

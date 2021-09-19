@@ -16,6 +16,8 @@ import ru.kos.someApp.web.creditOffer.CreditOfferBrowser;
 
 import java.util.ResourceBundle;
 
+import static ru.kos.someApp.web.configs.AppConfig.resourceBundle;
+
 @Route("")
 public class MainScreen extends AppLayout {
 
@@ -39,17 +41,16 @@ public class MainScreen extends AppLayout {
     }
 
     private void createDrawer() {
-        RouterLink clientLink = new RouterLink("Клиенты", ClientBrowser.class);
-        RouterLink creditLink = new RouterLink("Кредиты", CreditBrowser.class);
-        RouterLink bankLink = new RouterLink("Банки", BankBrowser.class);
-        RouterLink creditOfferLink = new RouterLink("Кредитные предложения", CreditOfferBrowser.class);
-        ComboBox<ResourceBundle> testCB = new ComboBox<>();
-        testCB.setItems(ResourceBundle.getBundle("messages_ru"), ResourceBundle.getBundle("messages_eng"));
+        RouterLink clientLink = new RouterLink(resourceBundle.getString("mainLayoutClients"), ClientBrowser.class);
+        RouterLink creditLink = new RouterLink(resourceBundle.getString("mainLayoutCredits"), CreditBrowser.class);
+        RouterLink bankLink = new RouterLink(resourceBundle.getString("mainLayoutBanks"), BankBrowser.class);
+        RouterLink creditOfferLink = new RouterLink(
+                resourceBundle.getString("mainLayoutCreditOffers"), CreditOfferBrowser.class);
         clientLink.setHighlightCondition(HighlightConditions.sameLocation());
         creditLink.setHighlightCondition(HighlightConditions.sameLocation());
         bankLink.setHighlightCondition(HighlightConditions.sameLocation());
         creditOfferLink.setHighlightCondition(HighlightConditions.sameLocation());
 
-        addToDrawer(new VerticalLayout(clientLink, creditLink, bankLink, creditOfferLink, testCB));
+        addToDrawer(new VerticalLayout(clientLink, creditLink, bankLink, creditOfferLink));
     }
 }

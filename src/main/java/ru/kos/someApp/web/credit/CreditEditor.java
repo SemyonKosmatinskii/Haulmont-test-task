@@ -23,7 +23,7 @@ import ru.kos.someApp.entity.Credit;
 import ru.kos.someApp.service.BankService;
 import ru.kos.someApp.service.CreditService;
 
-import static ru.kos.someApp.web.configs.AppConfig.DURATION_OF_NOTIFICATION_SHORT;
+import static ru.kos.someApp.web.configs.AppConfig.*;
 
 
 @Route("credit")
@@ -52,17 +52,17 @@ public class CreditEditor extends AppLayout implements HasUrlParameter<Integer> 
 
         creditForm = new FormLayout();
 
-        titleField = new TextField("Название");
-        interestRateField = new NumberField("Процентная ставка");
+        titleField = new TextField(resourceBundle.getString("title"));
+        interestRateField = new NumberField(resourceBundle.getString("rate"));
         interestRateField.setPrefixComponent(new Icon(VaadinIcon.BOOK_PERCENT));
-        limitSumField = new NumberField("Максимальная сумма");
-        termField = new IntegerField("Срок (в мес.)");
+        limitSumField = new NumberField(resourceBundle.getString("maxSum"));
+        termField = new IntegerField(resourceBundle.getString("term"));
         termField.setHasControls(true);
         termField.setMin(0);
-        bankComboBox = new ComboBox<>("Банк");
+        bankComboBox = new ComboBox<>(resourceBundle.getString("bank"));
 
-        saveBtn = new Button("Сохранить");
-        cancelBtn = new Button("Отменить");
+        saveBtn = new Button(resourceBundle.getString("save"));
+        cancelBtn = new Button(resourceBundle.getString("cancel"));
 
         creditForm.add(titleField, interestRateField, limitSumField, termField, bankComboBox,
                 new Div(saveBtn, cancelBtn));
@@ -73,10 +73,10 @@ public class CreditEditor extends AppLayout implements HasUrlParameter<Integer> 
     public void setParameter(BeforeEvent beforeEvent, Integer creditId) {
         credit = creditService.getById(creditId).orElse(null);
         if (credit != null) {
-            addToNavbar(new H3("Редактирование кредита"));
+            addToNavbar(new H3(resourceBundle.getString("edit")));
         } else {
             credit = new Credit();
-            addToNavbar(new H3("Создание кредита"));
+            addToNavbar(new H3(resourceBundle.getString("createCredit")));
         }
         fillForm();
         configureBinding();
@@ -95,29 +95,29 @@ public class CreditEditor extends AppLayout implements HasUrlParameter<Integer> 
             termField.setValue(credit.getTerm());
             bankComboBox.setValue(credit.getBank());
             bankComboBox.setReadOnly(true);
-            bankComboBox.setHelperText("У существующего кредита нельзя менять банк");
+            bankComboBox.setHelperText(resourceBundle.getString("bankHelp"));
         }
     }
 
     private void configureBinding() {
         binder.forField(titleField)
-                .asRequired("Это обязательное поле")
+                .asRequired(resourceBundle.getString("requiredField"))
                 .bind(Credit::getTitle, Credit::setTitle);
         binder.forField(interestRateField)
-                .asRequired("Это обязательное поле")
-                .withValidator(e -> e <= 500, "Установленно ограничение в 500%")
-                .withValidator(e -> e >= 0d, "Значение не может быть отрицательным")
+                .asRequired(resourceBundle.getString("requiredField"))
+                .withValidator(e -> e <= 500, resourceBundle.getString("rateHelp"))
+                .withValidator(e -> e >= 0d, resourceBundle.getString("warningPositive"))
                 .bind(Credit::getInterestRate, Credit::setInterestRate);
         binder.forField(limitSumField)
-                .asRequired("Это обязательное поле")
-                .withValidator(e -> e >= 0d, "Значение не может быть отрицательным")
+                .asRequired(resourceBundle.getString("requiredField"))
+                .withValidator(e -> e >= 0d, resourceBundle.getString("warningPositive"))
                 .bind(Credit::getInterestRate, Credit::setInterestRate);
         binder.forField(termField)
-                .asRequired("Это обязательное поле")
-                .withValidator(e -> e >= 0, "Значение не может быть отрицательным")
+                .asRequired(resourceBundle.getString("requiredField"))
+                .withValidator(e -> e >= 0, resourceBundle.getString("warningPositive"))
                 .bind(Credit::getTerm, Credit::setTerm);
         binder.forField(bankComboBox)
-                .asRequired("Это обязательное поле")
+                .asRequired(resourceBundle.getString("requiredField"))
                 .bind(Credit::getBank, Credit::setBank);
         binder.setBean(credit);
     }
@@ -135,7 +135,9 @@ public class CreditEditor extends AppLayout implements HasUrlParameter<Integer> 
                 creditService.add(credit);
 
                 Notification notification = new Notification(
-                        isNew ? "Кредит успешно создан" : "Кредит был изменен", DURATION_OF_NOTIFICATION_SHORT
+                        isNew ? resourceBundle.getString("createCreditOk") :
+                                resourceBundle.getString("editCreditOk"),
+                        DURATION_OF_NOTIFICATION_SHORT
                 );
                 notification.setPosition(Notification.Position.MIDDLE);
                 notification.addDetachListener(detachEvent -> {

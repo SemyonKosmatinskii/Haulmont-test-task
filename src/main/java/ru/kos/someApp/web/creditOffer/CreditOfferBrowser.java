@@ -26,7 +26,7 @@ import javax.annotation.PostConstruct;
 import java.text.SimpleDateFormat;
 import java.util.List;
 
-import static ru.kos.someApp.web.configs.AppConfig.DURATION_OF_NOTIFICATION_SHORT;
+import static ru.kos.someApp.web.configs.AppConfig.*;
 
 @Route(value = "creditOffers", layout = MainScreen.class)
 public class CreditOfferBrowser extends AppLayout {
@@ -49,7 +49,8 @@ public class CreditOfferBrowser extends AppLayout {
     public CreditOfferBrowser() {
         VerticalLayout layout = new VerticalLayout();
         grid = new Grid<>();
-        RouterLink linkCreate = new RouterLink("Оформить кредитное предложение", CreditOfferEditor.class, 0);
+        RouterLink linkCreate = new RouterLink(resourceBundle.getString("createCreditOffer"),
+                CreditOfferEditor.class, 0);
         layout.add(linkCreate);
         layout.add(grid);
         setContent(layout);
@@ -60,25 +61,29 @@ public class CreditOfferBrowser extends AppLayout {
 
         List<CreditOffer> creditOffers = creditOfferService.getAll();
         if (!creditOffers.isEmpty()) {
-            grid.addColumn(creditOffer -> creditOffer.getClient().getLastName()).setHeader("Фамилия клиента");
-            grid.addColumn(creditOffer -> creditOffer.getClient().getFirstName()).setHeader("Имя клиента");
-            grid.addColumn(creditOffer -> creditOffer.getCredit().getTitle()).setHeader("Кредит");
-            grid.addColumn(creditOffer -> creditOffer.getCredit().getBank().getName()).setHeader("Банк");
-            grid.addColumn(column ->
-                    new SimpleDateFormat("dd MMMM yyyy").format(column.getStartDate())).setHeader("Дата начала");
-            grid.addColumn(CreditOffer::getSumValue).setHeader("Сумма");
-            grid.addColumn(CreditOffer::getInitialFee).setHeader("Первоначальный платеж");
+            grid.addColumn(creditOffer ->
+                    creditOffer.getClient().getLastName()).setHeader(resourceBundle.getString("lastName"));
+            grid.addColumn(creditOffer ->
+                    creditOffer.getClient().getFirstName()).setHeader(resourceBundle.getString("firstName"));
+            grid.addColumn(creditOffer ->
+                    creditOffer.getCredit().getTitle()).setHeader(resourceBundle.getString("credit"));
+            grid.addColumn(creditOffer ->
+                    creditOffer.getCredit().getBank().getName()).setHeader(resourceBundle.getString("bank"));
+            grid.addColumn(column -> new SimpleDateFormat("dd MMMM yyyy").format(column.getStartDate())).
+                    setHeader(resourceBundle.getString("startDate"));
+            grid.addColumn(CreditOffer::getSumValue).setHeader(resourceBundle.getString("sum"));
+            grid.addColumn(CreditOffer::getInitialFee).setHeader(resourceBundle.getString("initialFee"));
 
-            grid.addColumn(new NativeButtonRenderer<>("Редактировать", creditOffer -> {
+            grid.addColumn(new NativeButtonRenderer<>(resourceBundle.getString("edit"), creditOffer -> {
                 UI.getCurrent().navigate(CreditOfferEditor.class, creditOffer.getId());
             }));
 
-            grid.addColumn(new NativeButtonRenderer<>("Удалить", creditOffer -> {
+            grid.addColumn(new NativeButtonRenderer<>(resourceBundle.getString("delete"), creditOffer -> {
                 Dialog dialog = createDeleteDialog(creditOffer);
                 dialog.open();
             }));
 
-            grid.addColumn(new NativeButtonRenderer<>("График платежей", e -> {
+            grid.addColumn(new NativeButtonRenderer<>(resourceBundle.getString("paymentSchedule"), e -> {
                 creditOffer = creditOfferService.getById(e.getId()).orElse(null);
                 List<Payment> paymentList = paymentService.getByCreditOfferId(e.getId());
                 creditOffer.setPaymentList(paymentList);
@@ -97,9 +102,9 @@ public class CreditOfferBrowser extends AppLayout {
 
     private Dialog createDeleteDialog(CreditOffer creditOffer) {
         Dialog dialog = new Dialog();
-        Button confirm = new Button("Удалить");
-        Button cancel = new Button("Отмена");
-        dialog.add("Вы уверены что хотите удалить кредитное предложение?");
+        Button confirm = new Button(resourceBundle.getString("delete"));
+        Button cancel = new Button(resourceBundle.getString("cancel"));
+        dialog.add(resourceBundle.getString("reallyDeleteCreditOffer"));
         dialog.add(confirm);
         dialog.add(cancel);
 
@@ -107,7 +112,7 @@ public class CreditOfferBrowser extends AppLayout {
             deleteCreditOffer(creditOffer);
             creditOfferService.delete(creditOffer);
             dialog.close();
-            Notification notification = new Notification("Кредитное предложение удалено",
+            Notification notification = new Notification(resourceBundle.getString("deleteCreditOffer"),
                     DURATION_OF_NOTIFICATION_SHORT);
             notification.setPosition(Notification.Position.MIDDLE);
             notification.open();

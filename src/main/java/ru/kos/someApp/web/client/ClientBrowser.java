@@ -43,8 +43,8 @@ public class ClientBrowser extends AppLayout {
     private void fillGrid() {
         List<Client> clients = clientService.getAll();
         if (!clients.isEmpty()) {
-            grid.addColumn(Client::getLastName).setHeader(resourceBundle.getString("family"));
-            grid.addColumn(Client::getFirstName).setHeader(resourceBundle.getString("name"));
+            grid.addColumn(Client::getLastName).setHeader(resourceBundle.getString("lastName"));
+            grid.addColumn(Client::getFirstName).setHeader(resourceBundle.getString("firstName"));
             grid.addColumn(Client::getPatronymic).setHeader(resourceBundle.getString("pat"));
             grid.addColumn(Client::getPhoneNumber).setHeader(resourceBundle.getString("phone"));
             grid.addColumn(Client::getEmail).setHeader(resourceBundle.getString("email"));
@@ -71,7 +71,7 @@ public class ClientBrowser extends AppLayout {
         Dialog dialog = new Dialog();
         Button confirm = new Button(resourceBundle.getString("delete"));
         Button cancel = new Button(resourceBundle.getString("cancel"));
-        dialog.add(resourceBundle.getString("reallyDelete"));
+        dialog.add(resourceBundle.getString("reallyDeleteClient"));
         dialog.add(confirm);
         dialog.add(cancel);
 

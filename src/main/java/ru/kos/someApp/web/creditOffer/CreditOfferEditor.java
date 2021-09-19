@@ -28,8 +28,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
-import static ru.kos.someApp.web.configs.AppConfig.DURATION_OF_NOTIFICATION_LONG;
-import static ru.kos.someApp.web.configs.AppConfig.DURATION_OF_NOTIFICATION_SHORT;
+import static ru.kos.someApp.web.configs.AppConfig.*;
 
 @Route("credit_offer")
 public class CreditOfferEditor extends AppLayout implements HasUrlParameter<Integer> {
@@ -78,34 +77,34 @@ public class CreditOfferEditor extends AppLayout implements HasUrlParameter<Inte
 
         creditOfferForm = new FormLayout();
 
-        clientComboBox = new ComboBox<>("Клиент:");
+        clientComboBox = new ComboBox<>(resourceBundle.getString("client"));
 
-        creditComboBox = new ComboBox<>("Кредит:");
+        creditComboBox = new ComboBox<>(resourceBundle.getString("credit"));
 
-        interestRateField = new NumberField("Процентная ставка:");
+        interestRateField = new NumberField(resourceBundle.getString("rate"));
 
-        limitSumField = new NumberField("Кредитный лимит:");
+        limitSumField = new NumberField(resourceBundle.getString("limitSum"));
 
-        termField = new IntegerField("Срок (в мес.):");
+        termField = new IntegerField(resourceBundle.getString("term"));
 
-        startDateField = new DatePicker("Дата начала:");
+        startDateField = new DatePicker(resourceBundle.getString("startDate"));
 
-        sumField = new NumberField("Сумма:");
-        sumField.setPlaceholder("Сумма не может превышать кредитный лимит");
+        sumField = new NumberField(resourceBundle.getString("sum"));
+        sumField.setPlaceholder(resourceBundle.getString("warningLimit"));
 
-        initialFeeField = new NumberField("Первоначальный взнос:");
+        initialFeeField = new NumberField(resourceBundle.getString("initialFee"));
         initialFeeField.setValue(0d);
 
-        calculateBtn = new Button("Расчитать график платежей");
+        calculateBtn = new Button(resourceBundle.getString("calculated"));
 
-        saveBtn = new Button("Сохранить");
-        cancelBtn = new Button("Отменить");
+        saveBtn = new Button(resourceBundle.getString("save"));
+        cancelBtn = new Button(resourceBundle.getString("cancel"));
 
         paymentGrid = new Grid<>();
 
-        resultPaymentField = new TextField("Итоговая сумма");
+        resultPaymentField = new TextField(resourceBundle.getString("resultSum"));
 
-        resultPercentField = new TextField("Сумма переплаты");
+        resultPercentField = new TextField(resourceBundle.getString("overSum"));
 
         creditOfferForm.setResponsiveSteps(new FormLayout.ResponsiveStep("30em", 3));
         creditOfferForm.add(clientComboBox,
@@ -133,10 +132,10 @@ public class CreditOfferEditor extends AppLayout implements HasUrlParameter<Inte
         if (creditOffer != null) {
             List<Payment> paymentList = paymentService.getByCreditOfferId(creditOffer.getId());
             creditOffer.setPaymentList(paymentList);
-            addToNavbar(new H3("Редактирование кредитного предложения"));
+            addToNavbar(new H3(resourceBundle.getString("edit")));
         } else {
             creditOffer = new CreditOffer();
-            addToNavbar(new H3("Создание кредитного предложения"));
+            addToNavbar(new H3(resourceBundle.getString("createCreditOffer")));
         }
 
         fillForm();
@@ -145,16 +144,16 @@ public class CreditOfferEditor extends AppLayout implements HasUrlParameter<Inte
     }
 
     private void fillForm() {
+        paymentGrid.addColumn(column -> new SimpleDateFormat("dd MMMM yyyy").format(column.getStartDate())).
+                setHeader(resourceBundle.getString("date"));
         paymentGrid.addColumn(column ->
-                new SimpleDateFormat("dd MMMM yyyy").format(column.getStartDate())).setHeader("Дата");
+                String.format("%1$,.2f", column.getPayment())).setHeader(resourceBundle.getString("payment"));
         paymentGrid.addColumn(column ->
-                String.format("%1$,.2f", column.getPayment())).setHeader("Платеж");
+                String.format("%1$,.2f", column.getPercent())).setHeader(resourceBundle.getString("percents"));
         paymentGrid.addColumn(column ->
-                String.format("%1$,.2f", column.getPercent())).setHeader("Гашение процентов");
+                String.format("%1$,.2f", column.getCapital())).setHeader(resourceBundle.getString("capital"));
         paymentGrid.addColumn(column ->
-                String.format("%1$,.2f", column.getCapital())).setHeader("Гашение тела");
-        paymentGrid.addColumn(column ->
-                String.format("%1$,.2f", column.getResidue())).setHeader("Остаток");
+                String.format("%1$,.2f", column.getResidue())).setHeader(resourceBundle.getString("residue"));
         interestRateField.setReadOnly(true);
         limitSumField.setReadOnly(true);
         termField.setReadOnly(true);
@@ -201,13 +200,13 @@ public class CreditOfferEditor extends AppLayout implements HasUrlParameter<Inte
     private void configureBinding() {
 
         binder.forField(clientComboBox)
-                .asRequired("Это обязательное поле")
+                .asRequired(resourceBundle.getString("requiredField"))
                 .bind(CreditOffer::getClient, CreditOffer::setClient);
         binder.forField(creditComboBox)
-                .asRequired("Это обязательное поле")
+                .asRequired(resourceBundle.getString("requiredField"))
                 .bind(CreditOffer::getCredit, CreditOffer::setCredit);
         binder.forField(startDateField)
-                .asRequired("Это обязательное поле")
+                .asRequired(resourceBundle.getString("requiredField"))
                 .bind(creditOffer -> {
                             Date startDate = creditOffer.getStartDate();
                             if (startDate != null) {
@@ -215,19 +214,19 @@ public class CreditOfferEditor extends AppLayout implements HasUrlParameter<Inte
                             }
                             return LocalDate.now();
                         },
-                        (creditOffer, value) -> creditOffer.setStartDate(Date.from(value.atStartOfDay(ZoneId.systemDefault()).toInstant()))
+                        (creditOffer, value) ->
+                                creditOffer.setStartDate(Date.from(value.atStartOfDay(ZoneId.systemDefault()).toInstant()))
                 );
         binder.forField(sumField)
-                .asRequired("Это обязательное поле")
+                .asRequired(resourceBundle.getString("requiredField"))
                 .withValidator(e -> {
-                            Double limitSumFieldValue = limitSumField.getValue();
-                            return limitSumFieldValue != null && e <= limitSumFieldValue;
-                        },
-                        "Значение не может превышать лимит по кредиту")
-                .withValidator(e -> e >= 0d, "Значение не может быть отрицательным")
+                    Double limitSumFieldValue = limitSumField.getValue();
+                    return limitSumFieldValue != null && e <= limitSumFieldValue;
+                }, resourceBundle.getString("warningLimit"))
+                .withValidator(e -> e >= 0d, resourceBundle.getString("warningPositive"))
                 .bind(CreditOffer::getSumValue, CreditOffer::setSumValue);
         binder.forField(initialFeeField)
-                .asRequired("Это обязательное поле")
+                .asRequired(resourceBundle.getString("requiredField"))
                 .withValidator(e -> {
                             Double sumFieldValue = sumField.getValue();
                             Double limitSumFieldValue = limitSumField.getValue();
@@ -236,8 +235,8 @@ public class CreditOfferEditor extends AppLayout implements HasUrlParameter<Inte
                                     && e <= sumFieldValue
                                     && e <= limitSumFieldValue;
                         },
-                        "Значение не может превышать сумму")
-                .withValidator(e -> e >= 0d, "Значение не может быть отрицательным")
+                        resourceBundle.getString("warningSum"))
+                .withValidator(e -> e >= 0d, resourceBundle.getString("warningPositive"))
                 .bind(CreditOffer::getInitialFee, CreditOffer::setInitialFee);
         binder.setBean(creditOffer);
     }
@@ -309,8 +308,8 @@ public class CreditOfferEditor extends AppLayout implements HasUrlParameter<Inte
 
 
                     Notification notification = new Notification(
-                            isNew ? "Кредитное предложение успешно создано" :
-                                    "Кредитное предложение было изменено",
+                            isNew ? resourceBundle.getString("createCreditOfferOk") :
+                                    resourceBundle.getString("editCreditOfferOk"),
                             DURATION_OF_NOTIFICATION_SHORT
                     );
                     notification.setPosition(Notification.Position.MIDDLE);
@@ -320,7 +319,7 @@ public class CreditOfferEditor extends AppLayout implements HasUrlParameter<Inte
                     creditOfferForm.setEnabled(false);
                     notification.open();
                 } else {
-                    Notification notification = new Notification("Необходимо расчитать график платежей",
+                    Notification notification = new Notification(resourceBundle.getString("needCalculated"),
                             DURATION_OF_NOTIFICATION_LONG);
                     notification.setPosition(Notification.Position.MIDDLE);
                     notification.open();

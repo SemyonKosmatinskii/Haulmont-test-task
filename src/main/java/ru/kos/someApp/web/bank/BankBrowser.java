@@ -22,8 +22,7 @@ import ru.kos.someApp.web.MainScreen;
 import javax.annotation.PostConstruct;
 import java.util.List;
 
-import static ru.kos.someApp.web.configs.AppConfig.DURATION_OF_NOTIFICATION_LONG;
-import static ru.kos.someApp.web.configs.AppConfig.DURATION_OF_NOTIFICATION_SHORT;
+import static ru.kos.someApp.web.configs.AppConfig.*;
 
 @Route(value = "banks", layout = MainScreen.class)
 public class BankBrowser extends AppLayout {
@@ -43,7 +42,8 @@ public class BankBrowser extends AppLayout {
         VerticalLayout layout = new VerticalLayout();
         bankGrid = new Grid<>();
 
-        RouterLink linkCreateBank = new RouterLink("Создать банк", BankEditor.class, 0);
+        RouterLink linkCreateBank = new RouterLink(
+                resourceBundle.getString("createBank"), BankEditor.class, 0);
         layout.add(linkCreateBank, bankGrid);
         setContent(layout);
     }
@@ -52,23 +52,23 @@ public class BankBrowser extends AppLayout {
     private void fillGrid() {
         List<Bank> banks = bankService.getAll();
         if (!banks.isEmpty()) {
-            bankGrid.addColumn(Bank::getName).setHeader("Название");
+            bankGrid.addColumn(Bank::getName).setHeader(resourceBundle.getString("title"));
 
-            bankGrid.addColumn(new NativeButtonRenderer<>("Редактировать", bank -> {
+            bankGrid.addColumn(new NativeButtonRenderer<>(resourceBundle.getString("edit"), bank -> {
                 UI.getCurrent().navigate(BankEditor.class, bank.getId());
             }));
 
-            bankGrid.addColumn(new NativeButtonRenderer<>("Удалить", bank -> {
+            bankGrid.addColumn(new NativeButtonRenderer<>(resourceBundle.getString("delete"), bank -> {
                 Dialog dialog = createDeleteDialog(bank);
                 dialog.open();
             }));
 
-            bankGrid.addColumn(new NativeButtonRenderer<>("Клиенты банка", bank -> {
+            bankGrid.addColumn(new NativeButtonRenderer<>(resourceBundle.getString("clientsBank"), bank -> {
                 Dialog dialog = createClientsDialog(bank);
                 dialog.open();
             }));
 
-            bankGrid.addColumn(new NativeButtonRenderer<>("Кредиты банка", bank -> {
+            bankGrid.addColumn(new NativeButtonRenderer<>(resourceBundle.getString("creditsBank"), bank -> {
                 Dialog dialog = createCreditsDialog(bank);
                 dialog.open();
             }));
@@ -83,16 +83,16 @@ public class BankBrowser extends AppLayout {
 
     private Dialog createDeleteDialog(Bank bank) {
         Dialog dialog = new Dialog();
-        Button confirm = new Button("Удалить");
-        Button cancel = new Button("Отмена");
-        dialog.add("Вы уверены что хотите удалить банк?");
+        Button confirm = new Button(resourceBundle.getString("delete"));
+        Button cancel = new Button(resourceBundle.getString("cancel"));
+        dialog.add(resourceBundle.getString("reallyDeleteBank"));
         dialog.add(confirm);
         dialog.add(cancel);
 
         Dialog innerDialog = new Dialog();
-        Button innerConfirm = new Button("Удалить");
-        Button innerCancel = new Button("Отмена");
-        innerDialog.add("Вместе с банком будут удалены все его кредиты");
+        Button innerConfirm = new Button(resourceBundle.getString("delete"));
+        Button innerCancel = new Button(resourceBundle.getString("cancel"));
+        innerDialog.add(resourceBundle.getString("warningBankCredit"));
         innerDialog.add(innerConfirm);
         innerDialog.add(innerCancel);
 
@@ -124,10 +124,10 @@ public class BankBrowser extends AppLayout {
 
         dialog.setWidth("800px");
         dialog.setHeight("600px");
-        grid.addColumn(Credit::getTitle).setHeader("Название");
-        grid.addColumn(Credit::getInterestRate).setHeader("Процентная ставка");
-        grid.addColumn(Credit::getLimitSum).setHeader("Максимальная сумма");
-        grid.addColumn(Credit::getTerm).setHeader("Срок (в мес.)");
+        grid.addColumn(Credit::getTitle).setHeader(resourceBundle.getString("title"));
+        grid.addColumn(Credit::getInterestRate).setHeader(resourceBundle.getString("rate"));
+        grid.addColumn(Credit::getLimitSum).setHeader(resourceBundle.getString("maxSum"));
+        grid.addColumn(Credit::getTerm).setHeader(resourceBundle.getString("term"));
         grid.setSizeFull();
         grid.setItems(creditList);
         dialog.add(grid);
@@ -141,12 +141,12 @@ public class BankBrowser extends AppLayout {
 
         dialog.setWidth("1100px");
         dialog.setHeight("600px");
-        grid.addColumn(Client::getLastName).setHeader("Фамилия");
-        grid.addColumn(Client::getFirstName).setHeader("Имя");
-        grid.addColumn(Client::getPatronymic).setHeader("Отчество");
-        grid.addColumn(Client::getPhoneNumber).setHeader("Номер телефона");
-        grid.addColumn(Client::getEmail).setHeader("email");
-        grid.addColumn(Client::getPassportData).setHeader("№ паспорта");
+        grid.addColumn(Client::getLastName).setHeader(resourceBundle.getString("lastName"));
+        grid.addColumn(Client::getFirstName).setHeader(resourceBundle.getString("firstName"));
+        grid.addColumn(Client::getPatronymic).setHeader(resourceBundle.getString("pat"));
+        grid.addColumn(Client::getPhoneNumber).setHeader(resourceBundle.getString("phone"));
+        grid.addColumn(Client::getEmail).setHeader(resourceBundle.getString("email"));
+        grid.addColumn(Client::getPassportData).setHeader(resourceBundle.getString("passport"));
         grid.setSizeFull();
         grid.setItems(clientList);
         dialog.add(grid);
@@ -158,7 +158,7 @@ public class BankBrowser extends AppLayout {
             bankService.delete(bank);
         } catch (Exception e) {
             Notification notification = new Notification(
-                    "Кредиты этого банка фигурируют в существующих кредитных предложениях",
+                    resourceBundle.getString("warningCreditOffer"),
                     DURATION_OF_NOTIFICATION_LONG);
             notification.setPosition(Notification.Position.MIDDLE);
             notification.open();
@@ -166,7 +166,8 @@ public class BankBrowser extends AppLayout {
             return;
         }
         innerDialog.close();
-        Notification notification = new Notification("Банк удален", DURATION_OF_NOTIFICATION_SHORT);
+        Notification notification = new Notification(resourceBundle.getString("deleteBank"),
+                DURATION_OF_NOTIFICATION_SHORT);
         notification.setPosition(Notification.Position.MIDDLE);
         notification.open();
 
