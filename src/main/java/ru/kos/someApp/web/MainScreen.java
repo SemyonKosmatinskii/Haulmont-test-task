@@ -2,6 +2,7 @@ package ru.kos.someApp.web;
 
 import com.vaadin.flow.component.applayout.AppLayout;
 import com.vaadin.flow.component.applayout.DrawerToggle;
+import com.vaadin.flow.component.combobox.ComboBox;
 import com.vaadin.flow.component.orderedlayout.FlexComponent;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
@@ -12,6 +13,8 @@ import ru.kos.someApp.web.bank.BankBrowser;
 import ru.kos.someApp.web.client.ClientBrowser;
 import ru.kos.someApp.web.credit.CreditBrowser;
 import ru.kos.someApp.web.creditOffer.CreditOfferBrowser;
+
+import java.util.ResourceBundle;
 
 @Route("")
 public class MainScreen extends AppLayout {
@@ -40,11 +43,13 @@ public class MainScreen extends AppLayout {
         RouterLink creditLink = new RouterLink("Кредиты", CreditBrowser.class);
         RouterLink bankLink = new RouterLink("Банки", BankBrowser.class);
         RouterLink creditOfferLink = new RouterLink("Кредитные предложения", CreditOfferBrowser.class);
+        ComboBox<ResourceBundle> testCB = new ComboBox<>();
+        testCB.setItems(ResourceBundle.getBundle("messages_ru"), ResourceBundle.getBundle("messages_eng"));
         clientLink.setHighlightCondition(HighlightConditions.sameLocation());
         creditLink.setHighlightCondition(HighlightConditions.sameLocation());
         bankLink.setHighlightCondition(HighlightConditions.sameLocation());
         creditOfferLink.setHighlightCondition(HighlightConditions.sameLocation());
 
-        addToDrawer(new VerticalLayout(clientLink, creditLink, bankLink, creditOfferLink));
+        addToDrawer(new VerticalLayout(clientLink, creditLink, bankLink, creditOfferLink, testCB));
     }
 }

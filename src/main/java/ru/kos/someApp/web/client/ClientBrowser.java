@@ -18,11 +18,11 @@ import ru.kos.someApp.web.MainScreen;
 import javax.annotation.PostConstruct;
 import java.util.List;
 
+import static ru.kos.someApp.web.configs.AppConfig.*;
+
 @Route(value = "clients", layout = MainScreen.class)
 public class ClientBrowser extends AppLayout {
 
-    private static final int DURATION_OF_NOTIFICATION_LONG = 3000;
-    private static final int DURATION_OF_NOTIFICATION_SHORT = 1000;
     private final Grid<Client> grid;
 
     @Autowired
@@ -31,7 +31,9 @@ public class ClientBrowser extends AppLayout {
     public ClientBrowser() {
         VerticalLayout layout = new VerticalLayout();
         grid = new Grid<>();
-        RouterLink linkCreate = new RouterLink("Создать клиента", ClientEditor.class, 0);
+
+        RouterLink linkCreate = new RouterLink(
+                resourceBundle.getString("createClient"), ClientEditor.class, 0);
         layout.add(linkCreate);
         layout.add(grid);
         setContent(layout);
@@ -41,18 +43,18 @@ public class ClientBrowser extends AppLayout {
     private void fillGrid() {
         List<Client> clients = clientService.getAll();
         if (!clients.isEmpty()) {
-            grid.addColumn(Client::getLastName).setHeader("Фамилия");
-            grid.addColumn(Client::getFirstName).setHeader("Имя");
-            grid.addColumn(Client::getPatronymic).setHeader("Отчество");
-            grid.addColumn(Client::getPhoneNumber).setHeader("Номер телефона");
-            grid.addColumn(Client::getEmail).setHeader("email");
-            grid.addColumn(Client::getPassportData).setHeader("№ паспорта");
+            grid.addColumn(Client::getLastName).setHeader(resourceBundle.getString("family"));
+            grid.addColumn(Client::getFirstName).setHeader(resourceBundle.getString("name"));
+            grid.addColumn(Client::getPatronymic).setHeader(resourceBundle.getString("pat"));
+            grid.addColumn(Client::getPhoneNumber).setHeader(resourceBundle.getString("phone"));
+            grid.addColumn(Client::getEmail).setHeader(resourceBundle.getString("email"));
+            grid.addColumn(Client::getPassportData).setHeader(resourceBundle.getString("passport"));
 
-            grid.addColumn(new NativeButtonRenderer<>("Редактировать", client -> {
+            grid.addColumn(new NativeButtonRenderer<>(resourceBundle.getString("edit"), client -> {
                 UI.getCurrent().navigate(ClientEditor.class, client.getId());
             }));
 
-            grid.addColumn(new NativeButtonRenderer<>("Удалить", client -> {
+            grid.addColumn(new NativeButtonRenderer<>(resourceBundle.getString("delete"), client -> {
                 Dialog dialog = createDeleteDialog(client);
                 dialog.open();
             }));
@@ -67,9 +69,9 @@ public class ClientBrowser extends AppLayout {
 
     private Dialog createDeleteDialog(Client client) {
         Dialog dialog = new Dialog();
-        Button confirm = new Button("Удалить");
-        Button cancel = new Button("Отмена");
-        dialog.add("Вы уверены что хотите удалить клиента?");
+        Button confirm = new Button(resourceBundle.getString("delete"));
+        Button cancel = new Button(resourceBundle.getString("cancel"));
+        dialog.add(resourceBundle.getString("reallyDelete"));
         dialog.add(confirm);
         dialog.add(cancel);
 
@@ -78,14 +80,15 @@ public class ClientBrowser extends AppLayout {
                clientService.delete(client);
             } catch (Exception e) {
                 Notification notification = new Notification(
-                        "У клиента имеются открытые кредитные предложения", DURATION_OF_NOTIFICATION_LONG);
+                        resourceBundle.getString("haveCreditOffer"), DURATION_OF_NOTIFICATION_LONG);
                 notification.setPosition(Notification.Position.MIDDLE);
                 notification.open();
                 dialog.close();
                 return;
             }
             dialog.close();
-            Notification notification = new Notification("Клиент удален", DURATION_OF_NOTIFICATION_SHORT);
+            Notification notification = new Notification(resourceBundle.getString("deleteClientOk"),
+                    DURATION_OF_NOTIFICATION_SHORT);
             notification.setPosition(Notification.Position.MIDDLE);
             notification.open();
 

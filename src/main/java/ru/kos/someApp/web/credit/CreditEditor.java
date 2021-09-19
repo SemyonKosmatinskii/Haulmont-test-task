@@ -19,19 +19,16 @@ import com.vaadin.flow.router.HasUrlParameter;
 import com.vaadin.flow.router.Route;
 import org.springframework.beans.factory.annotation.Autowired;
 import ru.kos.someApp.entity.Bank;
-import ru.kos.someApp.entity.Client;
 import ru.kos.someApp.entity.Credit;
 import ru.kos.someApp.service.BankService;
-import ru.kos.someApp.service.ClientService;
 import ru.kos.someApp.service.CreditService;
 
-import java.util.List;
-import java.util.Optional;
+import static ru.kos.someApp.web.configs.AppConfig.DURATION_OF_NOTIFICATION_SHORT;
+
 
 @Route("credit")
 public class CreditEditor extends AppLayout implements HasUrlParameter<Integer> {
 
-    private static final int DURATION_OF_NOTIFICATION_SHORT = 1000;
     private final FormLayout creditForm;
     private final TextField titleField;
     private final NumberField interestRateField;

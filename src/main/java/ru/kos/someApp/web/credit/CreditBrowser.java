@@ -18,11 +18,12 @@ import ru.kos.someApp.web.MainScreen;
 import javax.annotation.PostConstruct;
 import java.util.List;
 
+import static ru.kos.someApp.web.configs.AppConfig.DURATION_OF_NOTIFICATION_LONG;
+import static ru.kos.someApp.web.configs.AppConfig.DURATION_OF_NOTIFICATION_SHORT;
+
 @Route(value = "credits", layout = MainScreen.class)
 public class CreditBrowser extends AppLayout {
 
-    private static final int DURATION_OF_NOTIFICATION_LONG = 3000;
-    private static final int DURATION_OF_NOTIFICATION_SHORT = 1000;
     private final Grid<Credit> grid;
 
     @Autowired

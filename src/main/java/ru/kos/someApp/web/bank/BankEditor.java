@@ -17,10 +17,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import ru.kos.someApp.entity.Bank;
 import ru.kos.someApp.service.BankService;
 
+import static ru.kos.someApp.web.configs.AppConfig.DURATION_OF_NOTIFICATION_SHORT;
+
 @Route("bank")
 public class BankEditor extends AppLayout implements HasUrlParameter<Integer> {
 
-    private static final int DURATION_OF_NOTIFICATION_SHORT = 1000;
     private final TextField nameField;
     private final FormLayout bankForm;
     private final Button saveBtn;

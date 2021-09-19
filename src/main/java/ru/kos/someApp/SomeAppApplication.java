@@ -28,7 +28,7 @@ public class SomeAppApplication {
 			semyon.setLastName("Kosmatinskii");
 			semyon.setPatronymic("Sergeevich");
 			semyon.setEmail("kos@domain.com");
-			semyon.setPhoneNumber("89990001122");
+			semyon.setPhoneNumber("8(990)000 11 22");
 			semyon.setPassportData("3622563801");
 			clientRepository.save(semyon);
 
@@ -36,7 +36,7 @@ public class SomeAppApplication {
 			andrej.setFirstName("Andrej");
 			andrej.setLastName("Vorobjev");
 			andrej.setEmail("vorob@domain.com");
-			andrej.setPhoneNumber("89990001123");
+			andrej.setPhoneNumber("(496) 301-00-00");
 			andrej.setPassportData("3699007333");
 			clientRepository.save(andrej);
 
@@ -44,6 +44,7 @@ public class SomeAppApplication {
 			oleg.setFirstName("Oleg");
 			oleg.setLastName("Petrov");
 			oleg.setPatronymic("Artemievich");
+			semyon.setPhoneNumber("+7 898 0080008");
 			oleg.setPassportData("3600777001");
 			clientRepository.save(oleg);
 

@@ -10,6 +10,8 @@ import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.component.textfield.EmailField;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.data.binder.Binder;
+import com.vaadin.flow.data.binder.ValidationResult;
+import com.vaadin.flow.data.binder.Validator;
 import com.vaadin.flow.data.validator.RegexpValidator;
 import com.vaadin.flow.router.BeforeEvent;
 import com.vaadin.flow.router.HasUrlParameter;
@@ -18,10 +20,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import ru.kos.someApp.entity.Client;
 import ru.kos.someApp.service.ClientService;
 
+import static ru.kos.someApp.web.configs.AppConfig.DURATION_OF_NOTIFICATION_SHORT;
+
 @Route("client")
 public class ClientEditor extends AppLayout implements HasUrlParameter<Integer> {
 
-    private static final int DURATION_OF_NOTIFICATION_SHORT = 1000;
+
     private final FormLayout clientForm;
     private final TextField firstNameField;
     private final TextField lastNameField;
@@ -49,7 +53,7 @@ public class ClientEditor extends AppLayout implements HasUrlParameter<Integer> 
         numberPhoneField = new TextField("Номер телефона");
         emailField = new EmailField("Электронная почта");
         passportDataField = new TextField("Номер паспорта");
-        passportDataField.setHelperText("Должен быть не менее 6 символов и не более 12");
+        passportDataField.setHelperText("Не менее 6 и не более 12 символов");
 
         saveBtn = new Button("Сохранить");
         cancelBtn = new Button("Отменить");
@@ -92,12 +96,21 @@ public class ClientEditor extends AppLayout implements HasUrlParameter<Integer> 
                 .asRequired("Это обязательное поле")
                 .bind(Client::getLastName, Client::setLastName);
         binder.forField(numberPhoneField)
-        .withValidator(new RegexpValidator("Некорректный номер телефона",
-                "^((8|\\+7)[\\- ]?)?(\\(?\\d{3}\\)?[\\- ]?)?[\\d\\- ]{7,10}$"))
+                .asRequired("Это обязательное поле")
+                .withValidator(new RegexpValidator("Некорректный номер телефона",
+                        "^((8|\\+7)[\\- ]?)?(\\(?\\d{3}\\)?[\\- ]?)?[\\d\\- ]{7,10}$"))
                 .bind(Client::getPhoneNumber, Client::setPhoneNumber);
+        binder.forField(emailField)
+                .withValidator((Validator<String>) (e, valueContext) -> {
+                    if (emailField.isInvalid())
+                        return ValidationResult.error("");
+                    else
+                        return ValidationResult.ok();
+                })
+                .bind(Client::getEmail, Client::setEmail);
         binder.forField(passportDataField)
                 .asRequired("Это обязательное поле")
-                .withValidator(correctlyNumber -> correctlyNumber.length() >= 6 && correctlyNumber.length() <=12,
+                .withValidator(correctlyNumber -> correctlyNumber.length() >= 6 && correctlyNumber.length() <= 12,
                         "Минимум 6, максимум 12 символов")
                 .bind(Client::getPassportData, Client::setPassportData);
         binder.setBean(client);

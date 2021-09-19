@@ -26,10 +26,11 @@ import javax.annotation.PostConstruct;
 import java.text.SimpleDateFormat;
 import java.util.List;
 
+import static ru.kos.someApp.web.configs.AppConfig.DURATION_OF_NOTIFICATION_SHORT;
+
 @Route(value = "creditOffers", layout = MainScreen.class)
 public class CreditOfferBrowser extends AppLayout {
 
-    private static final int DURATION_OF_NOTIFICATION_SHORT = 1000;
     private final Grid<CreditOffer> grid;
     private CreditOffer creditOffer;
 
